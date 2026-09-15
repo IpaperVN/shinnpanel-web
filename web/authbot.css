@@ -1,0 +1,526 @@
+/* ═══════════════════════════════════════════════════════════════
+   AuthBot Dashboard — modern glass theme
+   Font tiêu đề: Minecraft Ten (tải qua cdnfonts, có fallback)
+   ═══════════════════════════════════════════════════════════════ */
+
+#authbot-page :root {
+  --bg: #0d0f14;
+  --bg2: #14171f;
+  --bg3: #1a1e28;
+  --card: rgba(255, 255, 255, .045);
+  --text: #e6e9f0;
+  --muted: #8b93a7;
+  --accent: #6d5cff;
+  --accent-2: #3f8cff;
+  --accent-hover: #5a48f0;
+  --grad: linear-gradient(135deg, #6d5cff 0%, #3f8cff 100%);
+  --grad-soft: linear-gradient(135deg, rgba(109, 92, 255, .16), rgba(63, 140, 255, .16));
+  --danger: #ff5c6a;
+  --ok: #2fd583;
+  --border: rgba(255, 255, 255, .08);
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, .38);
+  --font-title: 'Minecraft Ten', 'Trebuchet MS', 'Segoe UI', sans-serif;
+}
+
+#authbot-page * { box-sizing: border-box; }
+
+#authbot-page body {
+  margin: 0;
+  font-family: "gg sans", "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(900px 520px at 85% -10%, rgba(109, 92, 255, .17), transparent 60%),
+    radial-gradient(820px 520px at -12% 108%, rgba(63, 140, 255, .13), transparent 60%),
+    radial-gradient(600px 400px at 50% 120%, rgba(47, 213, 131, .06), transparent 60%),
+    linear-gradient(180deg, #0d0f14 0%, #0a0c11 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* ---- Scrollbar ---- */
+#authbot-page ::-webkit-scrollbar { width: 10px; height: 10px; }
+#authbot-page ::-webkit-scrollbar-track { background: transparent; }
+#authbot-page ::-webkit-scrollbar-thumb { background: #262b38; border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+#authbot-page ::-webkit-scrollbar-thumb:hover { background: #333a4b; background-clip: padding-box; }
+
+#authbot-page .hidden { display: none !important; }
+
+/* ═══════════ Topbar ═══════════ */
+#authbot-page .topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 22px;
+  background: rgba(13, 15, 20, .72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+#authbot-page .brand {
+  font-family: var(--font-title);
+  font-size: 20px;
+  letter-spacing: 1.5px;
+  background: linear-gradient(90deg, #9d8cff 0%, #5ea0ff 55%, #2fd583 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 22px rgba(109, 92, 255, .25);
+  user-select: none;
+}
+#authbot-page .brand .brand-sub {
+  font-family: "gg sans", "Segoe UI", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--grad-soft);
+  border: 1px solid var(--border);
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: var(--muted);
+}
+#authbot-page .user { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); }
+#authbot-page #userName { color: var(--text); font-weight: 600; }
+
+/* ═══════════ Buttons ═══════════ */
+#authbot-page .btn {
+  border-radius: 10px; padding: 9px 16px; cursor: pointer;
+  background: var(--card); color: var(--text); font-size: 14px; font-weight: 600;
+  border: 1px solid var(--border);
+  transition: transform .12s ease, box-shadow .15s ease, background .15s ease;
+}
+#authbot-page .btn:hover { background: rgba(255,#authbot-page 255,#authbot-page 255,#authbot-page .09); transform: translateY(-1px); }
+#authbot-page .btn:active { transform: translateY(0); }
+#authbot-page .btn.primary {
+  background: var(--grad); color: #fff; border: none;
+  box-shadow: 0 4px 16px rgba(109, 92, 255, .35);
+}
+#authbot-page .btn.primary:hover { box-shadow: 0 6px 22px rgba(109,#authbot-page 92,#authbot-page 255,#authbot-page .5); background: var(--grad); filter: brightness(1.08); }
+#authbot-page .btn.ghost { background: transparent; }
+#authbot-page .btn.danger { background: rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .14); color: #ff7d88; border: 1px solid rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .3); }
+#authbot-page .btn.danger:hover { background: rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .24); box-shadow: 0 4px 14px rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .25); }
+#authbot-page .btn.small { padding: 5px 11px; font-size: 12px; border-radius: 8px; }
+
+/* ═══════════ Login gate ═══════════ */
+#authbot-page .gate { display: grid; place-items: center; height: calc(100vh - 57px); }
+#authbot-page .gate-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+  border: 1px solid var(--border);
+  padding: 46px 44px; border-radius: 20px; max-width: 440px; text-align: center;
+  box-shadow: var(--shadow), 0 0 60px rgba(109, 92, 255, .12);
+  backdrop-filter: blur(10px);
+}
+#authbot-page .gate-card::before {
+  content: ""; position: absolute; inset: -1px; border-radius: 20px; pointer-events: none;
+  background: linear-gradient(135deg, rgba(109, 92, 255, .55), transparent 40%, transparent 65%, rgba(63, 140, 255, .45));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px;
+}
+#authbot-page .gate-card h1 {
+  font-family: var(--font-title);
+  font-size: 26px; letter-spacing: 1px; margin: 0 0 12px;
+  background: linear-gradient(90deg, #a99bff, #6cb1ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+#authbot-page .gate-card p { color: var(--muted); line-height: 1.6; margin-bottom: 22px; }
+#authbot-page .gate-card .btn.primary { padding: 12px 26px; font-size: 15px; }
+
+/* ═══════════ Shell / sidebar ═══════════ */
+#authbot-page .shell { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 57px); }
+#authbot-page .sidebar {
+  background: rgba(255, 255, 255, .02);
+  border-right: 1px solid var(--border);
+  padding: 18px 12px; display: flex; flex-direction: column; gap: 5px;
+}
+#authbot-page .navitem {
+  border: none; background: transparent; color: var(--muted); text-align: left;
+  padding: 11px 14px; border-radius: 11px; cursor: pointer; font-size: 14px;
+  font-weight: 600; font-family: inherit;
+  transition: background .15s, color .15s, box-shadow .15s, transform .12s;
+}
+#authbot-page .navitem:hover { background: var(--card); color: var(--text); transform: translateX(2px); }
+#authbot-page .navitem.active {
+  background: var(--grad); color: #fff;
+  box-shadow: 0 4px 18px rgba(109, 92, 255, .38);
+}
+#authbot-page .content { padding: 26px 28px; min-width: 0; }
+#authbot-page .tab { display: none; }
+#authbot-page .tab.active { display: block; animation: fadeUp .25s ease; }
+@keyframes fadeUp {
+#authbot-page from { opacity: 0; transform: translateY(8px); }
+#authbot-page to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════ Editor grid ═══════════ */
+#authbot-page .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+#authbot-page @media (max-width: 900px) { .shell { grid-template-columns: 190px 1fr; } }
+#authbot-page @media (max-width: 860px) {
+#authbot-page .app-grid { grid-template-columns: 1fr; }
+#authbot-page .shell { grid-template-columns: 1fr; }
+#authbot-page .sidebar { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); }
+#authbot-page .navitem { white-space: nowrap; }
+}
+
+#authbot-page .editor {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .018));
+  border: 1px solid var(--border);
+  padding: 22px; border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ═══════════ Tab header ═══════════ */
+#authbot-page .tab-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+#authbot-page .tab-head h2 {
+  margin: 0; font-family: var(--font-title); font-weight: 400;
+  font-size: 21px; letter-spacing: 1.2px;
+  background: linear-gradient(90deg, #c3b8ff 0%, #7db4ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+#authbot-page .hint { font-size: 13px; color: var(--muted); }
+#authbot-page .inline-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#authbot-page .inline-row input { width: auto; flex: 1; min-width: 140px; }
+
+/* ═══════════ Tables ═══════════ */
+#authbot-page table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .015));
+  border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow);
+}
+#authbot-page th,#authbot-page td { padding: 10px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+#authbot-page th {
+  background: rgba(255, 255, 255, .04);
+  color: var(--muted); text-transform: uppercase; font-size: 11px;
+  letter-spacing: .8px; font-weight: 700;
+}
+#authbot-page tr:last-child td { border-bottom: none; }
+#authbot-page tbody tr { transition: background .12s; }
+#authbot-page tbody tr:hover { background: rgba(255,#authbot-page 255,#authbot-page 255,#authbot-page .045); }
+#authbot-page td.empty { color: var(--muted); text-align: center; padding: 28px; }
+#authbot-page .mono { font-family: Consolas,#authbot-page "Courier New",#authbot-page monospace; font-size: 12px; color: #a9b6d9; }
+#authbot-page .actions-cell { white-space: nowrap; text-align: right; }
+
+/* ═══════════ Badges ═══════════ */
+#authbot-page .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .3px; }
+#authbot-page .badge-ok { background: rgba(47,#authbot-page 213,#authbot-page 131,#authbot-page .14); color: #4fe3a1; border: 1px solid rgba(47,#authbot-page 213,#authbot-page 131,#authbot-page .3); }
+#authbot-page .badge-danger { background: rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .14); color: #ff8a94; border: 1px solid rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .3); }
+#authbot-page .badge-default { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
+
+/* ═══════════ Forms ═══════════ */
+#authbot-page .row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+#authbot-page .row label { font-size: 11.5px; text-transform: uppercase; color: var(--muted); font-weight: 700; letter-spacing: .7px; }
+
+/* ── Character counters + Discord limits ── */
+#authbot-page .counter { text-transform: none; font-family: Consolas,#authbot-page monospace; font-size: 10.5px; color: var(--muted); letter-spacing: .3px; }
+#authbot-page .counter.over { color: var(--danger); font-weight: 700; }
+#authbot-page .counter.warn { color: #f5b04d; }
+#authbot-page .embed-count-badge { font-family: Consolas,#authbot-page monospace; font-size: 10.5px; }
+#authbot-page .fld-count { font-size: 9.5px; color: var(--muted); margin-left: 2px; white-space: nowrap; }
+#authbot-page .fld-count.over { color: var(--danger); font-weight: 700; }
+#authbot-page .limit-note { font-size: 10.5px; color: var(--muted); padding: 2px 0 8px; }
+#authbot-page .row.inline { flex-direction: row; align-items: center; }
+
+#authbot-page input[type=text],#authbot-page textarea,#authbot-page select {
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); padding: 10px 12px; font-size: 14px; font-family: inherit; width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+#authbot-page input[type=text]:focus,#authbot-page textarea:focus,#authbot-page select:focus {
+  outline: none; border-color: rgba(109, 92, 255, .65);
+  box-shadow: 0 0 0 3px rgba(109, 92, 255, .18);
+}
+#authbot-page input[type=text]::placeholder,#authbot-page textarea::placeholder { color: #5c6478; }
+#authbot-page input[type=color] { width: 48px; height: 36px; padding: 2px; border-radius: 10px; background: rgba(255,#authbot-page 255,#authbot-page 255,#authbot-page .04); border: 1px solid var(--border); cursor: pointer; }
+#authbot-page textarea { resize: vertical; }
+
+#authbot-page .embed-box {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 16px;
+  background: rgba(255, 255, 255, .02);
+}
+#authbot-page .embed-box legend { padding: 0 8px; font-size: 14px; font-weight: 600; }
+#authbot-page .embed-fields { display: grid; gap: 10px; }
+#authbot-page .embed-fields.disabled { opacity: .38; pointer-events: none; }
+
+#authbot-page .actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#authbot-page .status { font-size: 13px; color: var(--muted); margin-left: auto; }
+#authbot-page .status.ok { color: var(--ok); }
+#authbot-page .status.err { color: var(--danger); }
+
+/* ═══════════ Editor — embed cards ═══════════ */
+#authbot-page .embed-list-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+#authbot-page .embed-list-head label { font-size: 11.5px; text-transform: uppercase; color: var(--muted); font-weight: 700; letter-spacing: .7px; margin: 0; }.embed-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+#authbot-page .embed-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+#authbot-page .embed-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+#authbot-page .embed-card-actions { display: flex; gap: 4px; }
+#authbot-page .embed-card .embed-fields { padding: 12px 14px; }
+#authbot-page .embed-card.field-over { border-color: rgba(255,#authbot-page 92,#authbot-page 106,#authbot-page .3); }
+#authbot-page .no-embeds { color: var(--muted); font-size: 13px; padding: 16px; text-align: center; }
+
+/* ── Row pairs (side-by-side inputs) ── */
+#authbot-page .row-pair { display: flex; gap: 10px; }
+#authbot-page .row-pair input { flex: 1; }
+#authbot-page .row.inline-check { margin-bottom: 8px; }
+#authbot-page .chk { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+#authbot-page .chk input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+
+/* ── Fields sub-editor ── */
+#authbot-page .field-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px; padding-top: 6px; border-top: 1px solid var(--border);
+}
+#authbot-page .fields-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .5px; }
+#authbot-page .field-row {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap;
+}
+#authbot-page .field-row .fld-name { flex: 2; min-width: 80px; }
+#authbot-page .field-row .fld-value { flex: 3; min-width: 100px; }
+#authbot-page .fld-inline { font-size: 11px; color: var(--muted); white-space: nowrap; display: flex; align-items: center; gap: 3px; cursor: pointer; }
+#authbot-page .fld-inline input[type=checkbox] { width: 14px; height: 14px; margin: 0; cursor: pointer; }
+#authbot-page .del-field { color: var(--danger) !important; font-size: 13px !important; padding: 2px 6px !important; }
+
+/* ── Color row ── */
+#authbot-page .color-row { display: flex; align-items: center; gap: 8px; }
+#authbot-page .color-swatch {
+  width: 36px; height: 36px; border-radius: 10px; border: 2px solid var(--border); cursor: pointer;
+  transition: transform .1s, box-shadow .15s; flex-shrink: 0;
+}
+#authbot-page .color-swatch:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(0,#authbot-page 0,#authbot-page 0,#authbot-page .3); }
+#authbot-page .ed-color-hex { width: 100px; font-family: Consolas,#authbot-page monospace; text-transform: uppercase; }
+#authbot-page .color-hex-hint { font-size: 11px; color: var(--muted); }
+
+/* ═══════════ Color picker popover ═══════════ */
+#authbot-page .color-picker {
+  position: fixed; z-index: 9999;
+  background: #1a1e28; border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; width: 240px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  display: none;
+}
+#authbot-page .cp-pop { display: flex; flex-direction: column; gap: 12px; }
+
+#authbot-page .cp-sv {
+  position: relative; width: 100%; height: 160px; border-radius: 8px; cursor: crosshair;
+  background: #f00; /* replaced per-hue by JS */
+  overflow: hidden; user-select: none;
+}
+#authbot-page .cp-sv-dot {
+  position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid #fff; box-shadow: 0 0 4px rgba(0,0,0,.5);
+  transform: translate(-50%, -50%); pointer-events: none;
+  background: #fff;
+}
+
+#authbot-page .cp-controls { display: flex; align-items: center; gap: 10px; }
+#authbot-page .cp-controls input[type=range].cp-hue {
+  flex: 1; height: 8px; border-radius: 4px; -webkit-appearance: none; appearance: none;
+  background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  outline: none; cursor: pointer;
+}
+#authbot-page .cp-controls input[type=range].cp-hue::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #ccc; cursor: pointer;
+}
+#authbot-page .cp-controls input[type=range].cp-hue::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #ccc; cursor: pointer;
+}
+#authbot-page .cp-controls .cp-hex {
+  width: 80px; font-family: Consolas, monospace; font-size: 13px; text-transform: uppercase;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); padding: 6px 8px; text-align: center;
+}
+#authbot-page .cp-controls .cp-hex:focus { outline: none; border-color: rgba(109,#authbot-page 92,#authbot-page 255,#authbot-page .65); }
+
+#authbot-page .cp-swatches {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+#authbot-page .cp-swatch {
+  width: 28px; height: 28px; border-radius: 6px; border: 2px solid var(--border); cursor: pointer;
+  padding: 0; transition: transform .1s, box-shadow .1s;
+}
+#authbot-page .cp-swatch:hover { transform: scale(1.15); box-shadow: 0 0 8px rgba(0,#authbot-page 0,#authbot-page 0,#authbot-page .3); }
+
+/* ═══════════ Preview — Discord-like full message ═══════════ */
+#authbot-page .preview-pane { position: sticky; top: 76px; align-self: start; }
+#authbot-page .preview-label {
+  font-size: 11.5px; text-transform: uppercase; color: var(--muted);
+  font-weight: 700; letter-spacing: .7px; margin-bottom: 8px;
+}
+#authbot-page .discord-msg {
+  background: #313338; border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: var(--radius); padding: 18px; min-height: 90px;
+  box-shadow: var(--shadow); font-size: 15px; line-height: 1.5;
+}
+#authbot-page .discord-content { white-space: pre-wrap; word-wrap: break-word; margin-bottom: 8px; }
+
+/* ── Preview head (avatar + username + timestamp) ── */
+#authbot-page .pv-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+#authbot-page .pv-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+#authbot-page .pv-avatar-fallback {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--grad); color: #fff; font-weight: 700; font-size: 18px;
+}
+#authbot-page .pv-meta { display: flex; flex-direction: column; gap: 2px; }
+#authbot-page .pv-name { font-weight: 600; color: #fff; font-size: 16px; }
+#authbot-page .pv-time { font-size: 12px; color: #949ba4; }
+
+/* ── Embed styling ── */
+#authbot-page .embed-preview { display: flex; border-left: 4px solid var(--accent); background: #2b2d31; border-radius: 6px; padding: 12px 16px; max-width: 480px; margin-top: 8px; }
+#authbot-page .embed-preview + .embed-preview { margin-top: 8px; }
+#authbot-page .embed-main { flex: 1; min-width: 0; }
+#authbot-page .embed-author { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #fff; }
+#authbot-page .embed-title { color: #00a8fc; font-weight: 700; margin-bottom: 6px; font-size: 16px; }
+#authbot-page .embed-title a { color: #00a8fc; text-decoration: none; }
+#authbot-page .embed-title a:hover { text-decoration: underline; }
+#authbot-page .embed-desc { font-size: 14px; white-space: pre-wrap; color: #dbdee1; margin-bottom: 6px; }
+#authbot-page .embed-image { margin-top: 10px; max-width: 100%; border-radius: 6px; }
+#authbot-page .embed-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; margin-left: 14px; flex-shrink: 0; }
+#authbot-page .embed-footer { font-size: 12px; color: #949ba4; margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+#authbot-page .embed-footer-icon { width: 16px; height: 16px; border-radius: 50%; object-fit: cover; }
+
+/* ── Inline fields grid (preview) ── */
+#authbot-page .embed-fields-grid { margin-top: 8px; }
+#authbot-page .pf-row { display: flex; gap: 8px; margin-bottom: 6px; }
+#authbot-page .pf-cell { flex: 1; min-width: 0; font-size: 13px; color: #dbdee1; font-weight: 500; }
+#authbot-page .pf-name { font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 2px; }
+#authbot-page .pf-value { font-size: 13px; color: #dbdee1; font-weight: 400; word-wrap: break-word; }
+
+/* ── Markdown-lite additions ── */
+#authbot-page .md-quote { display: block; border-left: 3px solid #4e5058; padding-left: 8px; color: #949ba4; }
+#authbot-page .discord-msg code { background: #1e1f22; padding: 1px 4px; border-radius: 3px; font-size: 13px; font-family: Consolas,#authbot-page monospace; }
+#authbot-page .discord-msg del { text-decoration: line-through; }
+
+/* ═══════════ Stats + Settings ═══════════ */
+#authbot-page .charts-grid { display: grid; grid-template-columns: repeat(auto-fit,#authbot-page minmax(340px,#authbot-page 1fr)); gap: 16px; }
+#authbot-page .card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow);
+}
+#authbot-page .card h3 { margin: 0 0 12px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+
+#authbot-page .settings-grid { display: grid; grid-template-columns: repeat(auto-fit,#authbot-page minmax(320px,#authbot-page 1fr)); gap: 16px; }
+#authbot-page .settings-group {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow);
+}
+#authbot-page .settings-group h3 { margin: 0 0 10px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+#authbot-page .settings-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 6px 0; font-size: 13.5px; border-bottom: 1px solid var(--border);
+}
+#authbot-page .settings-row:last-child { border-bottom: none; }
+#authbot-page .settings-row input[type=text] { width: 220px; }
+#authbot-page .settings-row input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
+
+#authbot-page .banner {
+  padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; font-size: 13.5px;
+  background: rgba(47, 213, 131, .12); border: 1px solid rgba(47, 213, 131, .35); color: #4fe3a1;
+}
+#authbot-page .banner.warn { background: rgba(250,#authbot-page 166,#authbot-page 26,#authbot-page .1); border-color: rgba(250,#authbot-page 166,#authbot-page 26,#authbot-page .4); color: #f5b04d; }
+
+/* ═══════════ ESPaper tab ═══════════ */
+#authbot-page .cards { display: grid; grid-template-columns: repeat(auto-fit,#authbot-page minmax(170px,#authbot-page 1fr)); gap: 14px; margin-bottom: 18px; }
+#authbot-page .cards .card h3 { margin-bottom: 6px; }
+#authbot-page .stat-num { font-size: 22px; font-weight: 700; color: var(--text); }
+#authbot-page tr.clickable { cursor: pointer; }
+#authbot-page tr.clickable:hover td { background: rgba(255,#authbot-page 255,#authbot-page 255,#authbot-page .04); }
+#authbot-page #espaperSearch.input { width: 240px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — điện thoại (≤720px)
+   Mục tiêu: mọi thứ nhỏ lại, bảng cuộn ngang thay vì tràn,
+   sidebar thành bottom nav, touch-friendly.
+   ═══════════════════════════════════════════════════════════════ */
+#authbot-page @media (max-width: 720px) {
+  /* ---- Tổng thể: thu nhỏ ---- */
+#authbot-page body { font-size: 14px; }
+
+  /* ---- Topbar ---- */
+#authbot-page .topbar { padding: 8px 12px; }
+#authbot-page .brand { font-size: 16px; letter-spacing: 1px; }
+#authbot-page .brand .brand-sub { display: none; }          /* ẩn "DASHBOARD" nhỏ trên mobile */
+#authbot-page .user { font-size: 12px; gap: 8px; }
+
+  /* ---- Sidebar thành bottom nav ---- */
+#authbot-page .shell { grid-template-columns: 1fr; min-height: auto; }
+#authbot-page .sidebar {
+    flex-direction: row; overflow-x: auto; gap: 4px;
+    padding: 8px 8px; border-right: none; border-bottom: 1px solid var(--border);
+    position: sticky; top: 57px; z-index: 40; background: rgba(13,15,20,.9);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+#authbot-page .navitem {
+    padding: 8px 10px; font-size: 12.5px; border-radius: 9px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ---- Content ---- */
+#authbot-page .content { padding: 14px 12px; }
+#authbot-page .tab-head { margin-bottom: 10px; gap: 8px; }
+#authbot-page .tab-head h2 { font-size: 17px; }
+#authbot-page .hint { font-size: 12px; }
+#authbot-page .inline-row { flex-wrap: wrap; }
+#authbot-page .inline-row input { min-width: 0; }
+
+  /* ---- Card / editor ---- */
+#authbot-page .editor { padding: 14px; }
+#authbot-page .card,#authbot-page .settings-group { padding: 12px; }
+
+  /* ---- Table: cuộn ngang + co nhỏ ---- */
+#authbot-page .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#authbot-page th,#authbot-page td { padding: 7px 9px; font-size: 12px; }
+#authbot-page th { font-size: 10px; letter-spacing: .5px; }
+#authbot-page .mono { font-size: 11px; }
+#authbot-page .actions-cell { white-space: nowrap; }
+#authbot-page .badge { padding: 2px 8px; font-size: 10px; }
+
+  /* ---- Form ---- */
+#authbot-page input[type=text],#authbot-page textarea,#authbot-page select { font-size: 16px; padding: 9px 10px; } /* 16px tránh iOS zoom */
+#authbot-page .settings-row { flex-wrap: wrap; gap: 8px; }
+#authbot-page .settings-row input[type=text] { width: 100%; }
+#authbot-page .row-pair { flex-direction: column; gap: 8px; }
+#authbot-page .field-row { flex-wrap: wrap; }
+#authbot-page .field-row .fld-name,#authbot-page .field-row .fld-value { flex: 1 1 100%; min-width: 0; }
+
+  /* ---- ESPaper / stats ---- */
+#authbot-page .charts-grid,#authbot-page .settings-grid { grid-template-columns: 1fr; }
+#authbot-page .cards { grid-template-columns: repeat(auto-fit,#authbot-page minmax(140px,#authbot-page 1fr)); gap: 10px; }
+#authbot-page .stat-num { font-size: 18px; }
+#authbot-page #espaperSearch { width: 100%; }
+
+  /* ---- Preview ---- */
+#authbot-page .preview-pane { position: static; }
+#authbot-page .discord-msg { padding: 12px; font-size: 14px; }
+
+  /* ---- Login gate ---- */
+#authbot-page .gate { height: calc(100vh - 57px); }
+#authbot-page .gate-card { padding: 28px 20px; max-width: 92%; }
+#authbot-page .gate-card h1 { font-size: 21px; }
+#authbot-page .gate-card .btn.primary { padding: 11px 20px; font-size: 14px; }
+
+  /* ---- Nút nhỏ touch-friendly ---- */
+#authbot-page .btn { padding: 8px 14px; font-size: 13px; }
+#authbot-page .btn.small { padding: 6px 10px; font-size: 11px; }
+
+  /* ---- Color picker ---- */
+#authbot-page .color-picker { width: min(92vw,#authbot-page 240px); }
+}
+

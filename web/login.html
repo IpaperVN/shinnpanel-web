@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShinnPanel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   ShinnPanel — login kiểu Claude Code CLI (client window)
+   Phase 2: nhập tài khoản → mật khẩu (ẩn, không vào DOM nội dung)
+   → xác nhận Discord OAuth → /  dashboard
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #1e1e1e;
+  --bg-2: #252526;
+  --bg-3: #2a2d2e;
+  --border: #333;
+  --fg: #f0f0f0;
+  --muted: #a0a0a0;
+  --dim: #737373;
+  --green: #98c379;
+  --red: #e06c75;
+  --yellow: #e5c07b;
+  --blue: #61afef;
+  --purple: #c678dd;
+  --accent: #d97757;
+  --font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.win {
+  width: min(680px, 94vw);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.55);
+  background: var(--bg-2);
+}
+.win-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--dim);
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.dot.r { background: #e05561; }
+.dot.y { background: #d8a13b; }
+.dot.g { background: #4bb75a; }
+.title { margin-left: 8px; }
+.win-body { padding: 20px 22px 24px; }
+.banner { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 22px; }
+.logo {
+  width: 38px; height: 38px; border-radius: 9px;
+  background: linear-gradient(135deg, #d97757, #a6583c);
+  color: #fff; font-weight: 700; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.banner h1 { font-size: 20px; font-weight: 600; }
+.banner .sub { color: var(--dim); font-size: 12px; margin-top: 3px; }
+.line { display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 30px; }
+.prompt { color: var(--green); }
+.prompt::before { content: "➜"; color: var(--accent); margin-right: 6px; }
+.label { color: var(--muted); }
+.input-holder { color: var(--fg); min-width: 2ch; }
+.pass-dots { color: var(--fg); letter-spacing: .18em; }
+.cursor { display: inline-block; width: 8px; height: 17px; background: var(--accent); animation: blink 1s steps(1) infinite; vertical-align: middle; }
+@keyframes blink { 50% { opacity: 0; } }
+input {
+  background: transparent; border: 0; outline: 0; color: transparent; caret-color: transparent;
+  font-family: var(--font); font-size: 14px; width: 1px; height: 1px; position: fixed;
+  top: -10px; left: 0; opacity: 0; pointer-events: none;
+}
+.msg { font-size: 13px; margin-top: 14px; line-height: 1.7; white-space: pre-wrap; }
+.msg.err { color: var(--red); }
+.msg.ok  { color: var(--green); }
+.msg.info{ color: var(--muted); }
+.msg.oauth { color: var(--fg); border: 1px solid var(--border); background: var(--bg-3); border-radius: 6px; padding: 10px 12px; }
+.msg.oauth b { color: var(--accent); }
+.hidden { display: none; }
+.step .line { opacity: .55; }
+.step.active .line { opacity: 1; }
+#locked {
+  color: var(--yellow); border: 1px solid var(--border); background: var(--bg-3);
+  border-radius: 6px; padding: 10px 12px; margin-top: 14px;
+}
+.spin {
+  display: inline-block; width: 12px; height: 12px; border: 2px solid var(--dim);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.statusbar {
+  display: flex; justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding: 6px 12px; font-size: 11px; color: var(--dim);
+}
+.statusbar .right { text-align: right; }
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="win-bar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">shinnpanel — admin</span>
+  </div>
+
+  <div class="win-body">
+    <div class="banner">
+      <div class="logo">SP</div>
+      <div>
+        <h1>ShinnPanel</h1>
+        <div class="sub">Minecraft server + AuthBot console</div>
+      </div>
+    </div>
+
+    <!-- bước 1: tài khoản -->
+    <div id="step-account" class="step active">
+      <div class="line">
+        <span class="prompt"></span>
+        <span class="label">tài khoản</span>
+        <span class="input-holder" id="acct-holder"></span><span class="cursor" id="acct-cursor"></span>
+      </div>
+    </div>
+
+    <!-- bước 2: mật khẩu -->
+    <div id="step-pass" class="step hidden">
+      <div class="line">
+        <span class="prompt"></span>
+        <span class="label">mật khẩu</span>
+        <span class="pass-dots" id="pass-dots"></span><span class="cursor" id="pass-cursor"></span>
+      </div>
+    </div>
+
+    <!-- bước 3: xác nhận Discord -->
+    <div id="step-oauth" class="step hidden">
+      <div class="msg oauth">
+        <b>Bước 2:</b> Xác nhận đăng nhập bằng Discord.<br/>
+        Nhấn <b>Enter</b> để tiếp tục với Discord OAuth — nhấn <b>Esc</b> để quay lại nhập lại.
+      </div>
+    </div>
+
+    <div id="msgbox" class="msg hidden"></div>
+    <div id="locked" class="hidden"></div>
+  </div>
+
+  <div class="statusbar">
+    <span>ShinnPanel v0.2 · self-hosted</span>
+    <span class="right">🔒 login 2 bước · Discord OAuth</span>
+  </div>
+</div>
+
+<script>
+"use strict";
+{
+  // ─── DOM ───
+  const input = document.getElementById("pw");
+  if (!input) {
+    // input ẩn dùng để bắt phím — tạo ngay khi tải (ẩn tuyệt đối khỏi màn hình)
+    const i = document.createElement("input");
+    i.id = "pw";
+    i.type = "password";
+    i.autocomplete = "off";
+    i.autocapitalize = "off";
+    i.spellcheck = false;
+    document.body.appendChild(i);
+  }
+  const PWin = () => document.getElementById("pw");
+  const stepAccount = document.getElementById("step-account");
+  const stepPass    = document.getElementById("step-pass");
+  const stepOauth   = document.getElementById("step-oauth");
+  const acctHolder  = document.getElementById("acct-holder");
+  const passDots    = document.getElementById("pass-dots");
+  const msgbox      = document.getElementById("msgbox");
+  const lockedBox   = document.getElementById("locked");
+
+  // ─── state ───
+  let state = "account";   // account | pass | oauth
+  let account = "";
+  let password = "";
+  let lockUntil = 0;       // unix ms
+  let submitting = false;
+
+  const show  = el => el.classList.remove("hidden");
+  const hide  = el => el.classList.add("hidden");
+  const setActive = (el) => {
+    [stepAccount, stepPass, stepOauth].forEach(s => s.classList.remove("active"));
+    el.classList.add("active");
+  };
+
+  function msg(text, cls) {
+    if (!text) { hide(msgbox); return; }
+    msgbox.textContent = text;
+    msgbox.className = "msg " + (cls || "info");
+    show(msgbox);
+  }
+  function busy(text) {
+    msgbox.innerHTML = '<span class="spin"></span>' + (text || "đang xử lý…");
+    msgbox.className = "msg info";
+    show(msgbox);
+  }
+
+  function fmtDelay(ms) {
+    const s = Math.ceil(ms / 1000);
+    if (s >= 60) return Math.floor(s / 60) + " phút " + (s % 60) + "s";
+    return s + "s";
+  }
+
+  function renderLocked() {
+    if (lockUntil > Date.now()) {
+      lockedBox.textContent = "⛔ Tài khoản tạm khoá vì quá nhiều lần đăng nhập sai. Thử lại sau " + fmtDelay(lockUntil - Date.now()) + ".";
+      show(lockedBox);
+      setTimeout(renderLocked, 500);
+    } else {
+      hide(lockedBox);
+    }
+  }
+  function setLocked(ms) { lockUntil = Date.now() + ms; renderLocked(); }
+
+  // ─── hiển thị ───
+  function render() {
+    acctHolder.textContent = account;
+    if (msgbox.hidden === false && !msgbox.textContent && msgbox.classList.contains("hidden")) {}
+    if (state === "pass") passDots.textContent = "•".repeat(password.length);
+  }
+
+  function gotoAccount() {
+    state = "account"; password = ""; submitting = false;
+    show(stepAccount); hide(stepPass); hide(stepOauth); setActive(stepAccount);
+    render(); PWin().focus();
+  }
+  function gotoPass() {
+    state = "pass";
+    hide(stepAccount); show(stepPass); hide(stepOauth); setActive(stepPass);
+    passDots.textContent = "";
+    render(); PWin().focus();
+  }
+
+  // ─── API ───
+  async function apiLogin() {
+    submitting = true;
+    busy("đang xác minh…");
+    let r;
+    try {
+      r = await fetch("/api/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest"},
+        body: JSON.stringify({username: account, password: password})
+      });
+    } catch (e) {
+      submitting = false;
+      msg("Không kết nối được đến panel. Thử lại.", "err");
+      return;
+    }
+    let data = null;
+    try { data = await r.json(); } catch (e) {}
+
+    submitting = false;
+
+    if (r.status === 200) {
+      // bước 1 OK → bước 2: Discord OAuth
+      msg("✓ Đăng nhập tài khoản thành công. Đang mở Discord…", "ok");
+      hide(stepPass); show(stepOauth); setActive(stepOauth);
+      state = "oauth";
+      // tự động chuyển luôn tới OAuth (như plan: Enter xác nhận)
+      // — ta chờ sự kiện Enter/Esc trong state oauth
+      return;
+    }
+
+    const err = data && data.error ? data.error : ("lỗi " + r.status);
+    switch (err) {
+      case "too_many_attempts":
+        msg("429 — quá nhiều lần thử. Đợi 1 phút rồi thử lại.", "err");
+        break;
+      case "account_locked":
+        msg("423 — tài khoản đã bị khoá tạm thời.", "err");
+        if (r.headers.get("X-RateLimit-Reset")) {
+          setLocked(parseInt(r.headers.get("X-RateLimit-Reset"), 10) * 1000 - Date.now());
+        }
+        break;
+      case "invalid_credentials":
+        msg("Sai tài khoản hoặc mật khẩu.", "err");
+        break;
+      case "password_too_short":
+        msg("Mật khẩu quá ngắn (tối thiểu 12 ký tự).", "err");
+        break;
+      default:
+        msg("Lỗi: " + err, "err");
+    }
+    show(stepPass); hide(stepAccount);
+    password = "";
+    render();
+    PWin().focus();
+  }
+
+  // ─── xử lý phím ───
+  function handleKey(ev) {
+    if (submitting) { ev.preventDefault(); return; }
+    const v = ev.key;
+
+    if (state === "account") {
+      if (v === "Enter") {
+        ev.preventDefault();
+        account = account.trim();
+        if (!account) { msg("Nhập tài khoản trước.", "err"); return; }
+        msg("");
+        gotoPass();
+      } else if (v === "Backspace") {
+        ev.preventDefault();
+        account = account.slice(0, -1);
+      } else if (v.length === 1 && !ev.ctrlKey && !ev.altKey && !ev.metaKey) {
+        account += v;
+      }
+      render();
+    } else if (state === "pass") {
+      if (v === "Enter") {
+        ev.preventDefault();
+        if (password.length < 12) { msg("Mật khẩu tối thiểu 12 ký tự.", "err"); return; }
+        apiLogin();
+        render();
+      } else if (v === "Escape") {
+        ev.preventDefault();
+        password = "";
+        gotoAccount();
+      } else if (v === "Backspace") {
+        ev.preventDefault();
+        password = password.slice(0, -1);
+        render();
+      } else if (v.length === 1 && !ev.ctrlKey && !ev.altKey && !ev.metaKey) {
+        password += v;
+        render();
+      }
+    } else if (state === "oauth") {
+      if (v === "Enter") {
+        ev.preventDefault();
+        window.location.href = "/oauth/login";
+      } else if (v === "Escape") {
+        ev.preventDefault();
+        gotoAccount();
+      }
+    }
+  }
+
+  document.addEventListener("keydown", handleKey);
+  document.addEventListener("click", () => PWin().focus());
+
+  // ─── khởi động: nếu đã có session → dashboard; preauth → nhập pass ───
+  (async () => {
+    try {
+      const r = await fetch("/api/me", {headers: {"X-Requested-With": "XMLHttpRequest"}});
+      const d = await r.json();
+      if (r.status === 200 && d.authenticated) {
+        window.location.href = "/";
+        return;
+      }
+      if (r.status === 200 && d.step === 1) {
+        // đã có preauth từ lần trước → tiếp tục sang bước Discord
+        account = d.username || "";
+        state = "oauth";
+        show(stepOauth); setActive(stepOauth);
+        render();
+      }
+    } catch (e) {}
+    PWin().focus();
+  })();
+}
+</script>
+</body>
+</html>

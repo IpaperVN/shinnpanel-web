@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShinnPanel — Control Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css" />
+<link rel="stylesheet" href="/authbot.css" />
+</head>
+<body>
+
+<!-- Nav: 2 nhóm — server (overview, files) · authbot (authbot, logs) -->
+<div class="navbar">
+  <div class="nav-row">
+    <span class="nav-hint">server</span>
+    <button class="navitem active" data-nav="overview"><span class="idx">[1]</span> overview</button>
+    <button class="navitem" data-nav="files"><span class="idx">[2]</span> files</button>
+  </div>
+  <div class="nav-row">
+    <span class="nav-hint">authbot</span>
+    <button class="navitem" data-nav="authbot"><span class="idx">[3]</span> authbot</button>
+    <button class="navitem" data-nav="logs"><span class="idx">[4]</span> logs</button>
+  </div>
+  <div class="nav-right">
+    <span class="whoami" id="whoami" style="color:var(--dim);font-size:11px;align-self:center;">…</span>
+    <button class="icon-btn" id="btnTheme">theme</button>
+    <a class="icon-btn" href="/oauth/logout" title="đăng xuất">⎋ logout</a>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- ═══ OVERVIEW: os+players | console | status ═══ -->
+  <section class="page active" data-page="overview">
+    <div class="columns">
+      <!-- Trái: OS info (fastfetch compact) + players -->
+      <div class="col col-left">
+        <div class="os-info" id="osInfo">
+          <div class="os-banner" id="osBanner">skyblock@server</div>
+          <div class="os-row"><span class="os-k">os</span><span class="os-v blue" id="osName">—</span></div>
+          <div class="os-row"><span class="os-k">host</span><span class="os-v" id="osHost">—</span></div>
+          <div class="os-row"><span class="os-k">kernel</span><span class="os-v" id="osKernel">—</span></div>
+          <div class="os-row"><span class="os-k">cpu</span><span class="os-v" id="osCpu">—</span></div>
+          <div class="os-row"><span class="os-k">ip</span><span class="os-v green" id="osIp">—</span></div>
+          <div class="os-row"><span class="os-k">uptime</span><span class="os-v" id="osUptime">—</span></div>
+        </div>
+        <div>
+          <div class="panel-head"># <b>players</b> — <span id="pCountHome">0</span>/20</div>
+          <div class="tbl" id="playersHomeTbl"><div class="row"><span class="c dim">đang tải…</span></div></div>
+        </div>
+      </div>
+
+      <!-- Giữa: console -->
+      <div class="col col-console">
+        <div class="panel-head"># <b>console</b> — <span id="procState" style="color:var(--dim)">live log</span> <span id="procUptime" style="color:var(--dim);font-size:11px;"></span> <span id="pidVal" style="color:var(--dim);font-size:11px;"></span></div>
+        <div class="console" id="consoleEl"></div>
+        <div class="cmdline">
+          <span class="prompt">❯</span>
+          <input id="cmdInput" placeholder="say hello" autocomplete="off" spellcheck="false" />
+          <span class="cursor-block"></span>
+        </div>
+      </div>
+
+      <!-- Phải: status % ngang -->
+      <div class="col col-right">
+        <div class="proc-buttons">
+          <button class="btn primary" id="btnStart">► Start</button>
+          <button class="btn" id="btnStop">■ Stop</button>
+          <button class="btn" style="border-color:var(--red);color:var(--red);" id="btnKill">✕ Kill</button>
+        </div>
+        <div class="proc-msg" id="procMsg"></div>
+        <div class="panel-head" style="margin-top:12px;"># <b>status</b></div>
+        <div class="usage" id="usageEl">
+          <div class="st-item"><span class="st-k">ram</span><span class="st-bar-mini"><div class="st-fill ram" id="barRam" style="width:0%"></div></span><span class="st-v" id="uRamPct">0%</span></div>
+          <div class="st-item"><span class="st-k">cpu</span><span class="st-bar-mini"><div class="st-fill cpu" id="barCpu" style="width:0%"></div></span><span class="st-v" id="uCpuPct">0%</span></div>
+          <div class="st-item"><span class="st-k">disk</span><span class="st-bar-mini"><div class="st-fill disk" id="barDisk" style="width:0%"></div></span><span class="st-v" id="uDiskPct">0%</span></div>
+          <div class="st-item"><span class="st-k">tps</span><span class="st-bar-mini"><div class="st-fill tps" id="barTps" style="width:0%"></div></span><span class="st-v" id="uTpsPct">0%</span></div>
+        </div>
+        <div class="panel-head" style="margin-top:18px;"># <b>mc-run</b> — run.sh</div>
+        <div>
+          <div class="row" style="margin-bottom:7px;"><label style="width:130px;">run.sh</label><span class="mono" style="color:var(--muted);font-size:12px;" id="runshPath">—</span></div>
+          <div class="f-viewer mono" id="runshCode" style="height:auto;min-height:0;padding:10px;font-size:12px;">đang tải…</div>
+          <div style="margin-top:8px;"><button class="btn" id="btnEditRunsh">✏️ Sửa run.sh</button></div>
+        </div>
+        <div class="panel-head" style="margin-top:18px;"># <b>log</b></div>
+        <div class="notices" id="notices"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FILES: tree trái + nội dung phải ═══ -->
+  <section class="page" data-page="files">
+    <div class="files-split">
+      <div class="f-left">
+        <div class="panel-head"># <b>files</b> — <span id="filePath" style="color:var(--blue)">/</span></div>
+        <div class="tree" id="fileTree"><div class="row"><span class="c dim">đang tải…</span></div></div>
+      </div>
+      <div class="f-right">
+        <div class="panel-head"># <b>view</b> — <span id="fViewName" style="color:var(--muted)">chọn file</span> <button class="btn" id="btnFileSave" style="float:right;padding:2px 10px;" disabled>💾 Lưu</button></div>
+        <div class="f-viewer" id="fViewer" contenteditable="true" spellcheck="false">
+          <span style="color:var(--dim)">// nhấn vào file bên trái để xem; sửa trực tiếp ở đây rồi bấm Lưu</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ AUTHBOT ═══ -->
+  <section class="page" data-page="authbot">
+    <div id="dashboard" class="hidden">
+      <div id="authbot-page">
+      <div class="shell">
+        <nav class="sidebar">
+          <button class="navitem active" data-tab="editor">✏️ Editor</button>
+          <button class="navitem" data-tab="licenses">🔑 Licenses</button>
+          <button class="navitem" data-tab="scheduled">⏰ Scheduled</button>
+          <button class="navitem" data-tab="stats">📊 Stats</button>
+          <button class="navitem" data-tab="espaper">📦 ESPaper</button>
+          <button class="navitem" data-tab="settings">⚙️ Settings</button>
+          <button class="navitem" data-tab="logs">📋 Logs</button>
+        </nav>
+
+        <main class="content">
+          <!-- Editor tab -->
+          <section class="tab active" data-tab="editor">
+            <div class="app-grid">
+              <div class="editor">
+                <div class="row">
+                  <label for="channel">Kênh gửi</label>
+                  <div class="inline-row">
+                    <select id="channel"></select>
+                    <button class="btn ghost" id="reloadChannels" title="Tải lại">↻</button>
+                  </div>
+                </div>
+                <div class="row">
+                  <label for="templateSelect">Template</label>
+                  <div class="inline-row">
+                    <select id="templateSelect"><option value="">— Mới —</option></select>
+                    <button class="btn ghost" id="loadTemplate">Tải</button>
+                    <button class="btn ghost" id="deleteTemplate">Xoá</button>
+                  </div>
+                </div>
+                <div class="row">
+                  <label for="presetSelect">Mẫu embed nhanh</label>
+                  <select id="presetSelect">
+                    <option value="">— Chọn preset —</option>
+                    <option value="success">✅ Thành công</option>
+                    <option value="error">❌ Lỗi</option>
+                    <option value="info">ℹ️ Thông báo</option>
+                    <option value="warning">⚠️ Cảnh báo</option>
+                    <option value="giveaway">🎉 Giveaway</option>
+                    <option value="announcement">📢 Thông báo chung</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <label for="webhookName">Webhook name</label>
+                  <input id="webhookName" type="text" value="AuthBot" placeholder="AuthBot" />
+                </div>
+                <div class="row">
+                  <label for="webhookAvatar">Avatar URL</label>
+                  <input id="webhookAvatar" type="text" placeholder="https://..." />
+                </div>
+                <div class="row">
+                  <label for="content">Nội dung (content) <span class="counter" id="contentCounter">0/2000</span></label>
+                  <textarea id="content" rows="3" maxlength="2000" placeholder="Tin nhắn thường (tuỳ chọn)"></textarea>
+                </div>
+                <div class="embed-list-head">
+                  <label>Embeds <span class="counter" id="embedCount">0/10</span></label>
+                  <button class="btn ghost small" id="addEmbedBtn" type="button" title="Thêm embed">＋ Thêm embed</button>
+                </div>
+                <div id="embedsList"></div>
+                <div class="row">
+                  <label for="testChannel">Kênh test (gửi thử)</label>
+                  <select id="testChannel"><option value="">— Chọn kênh test —</option></select>
+                </div>
+                <div class="actions">
+                  <button class="btn primary" id="sendBtn">Gửi</button>
+                  <button class="btn" id="sendTestBtn">🧪 Gửi thử</button>
+                  <button class="btn" id="saveTemplateBtn">Lưu template</button>
+                  <button class="btn ghost small" id="clearDraftBtn">🗑 Xoá draft</button>
+                  <span id="status" class="status"></span>
+                </div>
+              </div>
+              <div class="preview-pane">
+                <div class="preview-label">Xem trước</div>
+                <div id="preview" class="discord-msg"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Licenses tab -->
+          <section class="tab" data-tab="licenses">
+            <div class="tab-head">
+              <h2>License keys</h2>
+              <div class="inline-row">
+                <input id="newLicenseKey" type="text" placeholder="Key mới" aria-label="Key mới" />
+                <input id="newLicenseLabel" type="text" placeholder="Ghi chú" aria-label="Ghi chú" />
+                <button class="btn primary" id="addLicenseBtn">Thêm</button>
+              </div>
+            </div>
+            <div id="licensesTable"></div>
+          </section>
+
+          <!-- Scheduled tab -->
+          <section class="tab" data-tab="scheduled">
+            <div class="tab-head"><h2>Scheduled messages</h2><span class="hint">Tạo qua /schedule; ở đây xem &amp; xoá</span></div>
+            <div id="scheduledTable"></div>
+          </section>
+
+          <!-- Stats tab -->
+          <section class="tab" data-tab="stats">
+            <div class="tab-head"><h2>Thống kê</h2><span class="hint">Dữ liệu từ DB — cần bật <code>features.stats</code> cho join/leave</span></div>
+            <div class="charts-grid">
+              <div class="card"><h3>Link account / ngày</h3><div id="chartLinks"></div></div>
+              <div class="card"><h3>Join / Leave theo ngày</h3><div id="chartMembers"></div></div>
+              <div class="card"><h3>Warn / tuần</h3><div id="chartWarns"></div></div>
+            </div>
+          </section>
+
+          <!-- ESPaper tab -->
+          <section class="tab" data-tab="espaper">
+            <div class="tab-head"><h2>📦 ESPaper — kho ExtraStorage</h2><span class="hint" id="espaperHint"></span></div>
+            <div id="espaperBanner" class="banner hidden"></div>
+            <div id="espaperOverview" class="cards"></div>
+            <div class="tab-head"><h3>Players</h3><input id="espaperSearch" class="input" placeholder="Tìm player..." aria-label="Tìm player" style="max-width:240px"></div>
+            <div id="espaperPlayers"></div>
+            <div id="espaperDetail"></div>
+            <div class="tab-head"><h3>Tổng server theo item</h3></div>
+            <div id="espaperItems"></div>
+          </section>
+
+          <!-- Settings tab -->
+          <section class="tab" data-tab="settings">
+            <div class="tab-head">
+              <h2>Settings</h2>
+              <button class="btn primary" id="saveSettingsBtn">💾 Lưu</button>
+            </div>
+            <div id="settingsBanner" class="banner hidden"></div>
+            <div id="settingsWarning" class="banner warn hidden"></div>
+            <div id="settingsForm" class="settings-grid"></div>
+          </section>
+
+          <!-- Logs tab -->
+          <section class="tab" data-tab="logs">
+            <div class="tab-head"><h2>Audit log</h2><span class="hint">100 sự kiện gần nhất</span></div>
+            <div id="logsTable"></div>
+            <div class="tab-head"><h2>Plugin status</h2></div>
+            <div id="pluginsTable"></div>
+          </section>
+        </main>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ LOGS ═══ — xem trong trang authbot: nhấn [4] logs → nhảy vào tab Logs ═══ -->
+  <section class="page" data-page="logs">
+    <div class="panel-head"># <b>audit log</b> — xem trong trang authbot (tab Logs)</div>
+    <div class="tbl" id="auditTbl">
+      <div class="row"><span class="c dim">[4] logs → authbot tab Logs (audit + plugin status)</span></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Status bar dưới -->
+<div class="statusbar">
+  <div class="sb-item"><span class="v green" id="sbProcess">●</span></div>
+  <div class="sb-item"><span class="k">players</span><span class="v" id="sbPlayers">0/20</span></div>
+  <div class="sb-item"><span class="k">ram</span><span class="v" id="sbRam">—</span><span class="sb-mini"><i id="sbBarRam" style="width:0%"></i></span></div>
+  <div class="sb-item"><span class="k">cpu</span><span class="v" id="sbCpu">—</span><span class="sb-mini"><i id="sbBarCpu" style="width:0%;background:var(--blue)"></i></span></div>
+  <div class="sb-item"><span class="k">tps</span><span class="v" id="sbTps">—</span></div>
+  <div class="sb-item"><span class="k">uptime</span><span class="v" id="sbUptime">—</span></div>
+</div>
+
+<script src="/api.js"></script>
+<script src="/util.js"></script>
+<script src="/app.js"></script>
+<script src="/editor.js"></script>
+</body>
+</html>
